@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB ER Diagram - Photo Sharing App</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0e7ff;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .diagram-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        #erDiagram {
+            min-width: 100%;
+            height: 500px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .schema-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .schema-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .schema-card h3 {
+            color: #64ffda;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .field {
+            margin-bottom: 10px;
+            padding-left: 10px;
+            border-left: 3px solid rgba(100, 255, 218, 0.5);
+        }
+        .field-name {
+            font-weight: 600;
+            color: #fff;
+        }
+        .field-type {
+            color: #ff79c6;
+            font-size: 0.9rem;
+        }
+        .index {
+            display: inline-block;
+            background: rgba(255, 121, 198, 0.2);
+            color: #ff79c6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        .relationships {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .relationships h2 {
+            color: #64ffda;
+            margin-bottom: 15px;
+        }
+        .relationship {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .relationship-models {
+            display: flex;
+            justify-content: space-between;
+            width: 40%;
+        }
+        .relationship-type {
+            width: 20%;
+            text-align: center;
+            color: #ffb86c;
+            font-weight: 600;
+        }
+        .relationship-desc {
+            width: 40%;
+            color: #bd93f9;
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .relationship {
+                flex-direction: column;
+                text-align: center;
+            }
+            .relationship-models, .relationship-type, .relationship-desc {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Photo Sharing Application ER Diagram</h1>
+            <p class="subtitle">This diagram illustrates the MongoDB schema design and relationships between User, Photo, and Comment models.</p>
+        </header>
+
+        <div class="diagram-container">
+            <div class="mermaid" id="erDiagram">
+erDiagram
+    USER {
+        string username
+        string email
+        string password
+    }
+    
+    PHOTO {
+        ObjectId owner
+        string url
+        string thumbUrl
+        number width
+        number height
+        string mime
+        number size
+        string caption
+        string[] tags
+        number likes
+        ObjectId[] likedBy
+        number commentsCount
+    }
+    
+    COMMENT {
+        ObjectId photo
+        ObjectId user
+        string text
+    }
+    
+    USER ||--o{ PHOTO : owns
+    USER ||--o{ COMMENT : writes
+    PHOTO ||--o{ COMMENT : has
+    USER }o--o{ PHOTO : likes
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #1a1a1a;"></div>
+                <span>Entity/Collection</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff5555;"></div>
+                <span>Required Field</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff79c6;"></div>
+                <span>Indexed Field</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #50fa7b;"></div>
+                <span>Reference Field</span>
+            </div>
+        </div>
+
+        <div class="schema-details">
+            <div class="schema-card">
+                <h3>User Model</h3>
+                <div class="field">
+                    <div class="field-name">username <span class="field-type">string (required, unique)</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">email <span class="field-type">string (required, unique)</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">password <span class="field-type">string (required)</span></div>
+                </div>
+                <p>Includes pre-save hook to hash password with bcrypt</p>
+                <p>Includes method to compare passwords</p>
+            </div>
+
+            <div class="schema-card">
+                <h3>Photo Model</h3>
+                <div class="field">
+                    <div class="field-name">owner <span class="field-type">ObjectId (ref: User)</span> <span class="index">indexed</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">url <span class="field-type">string (required)</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">thumbUrl <span class="field-type">string (required)</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">tags <span class="field-type">string[]</span> <span class="index">indexed</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">likes <span class="field-type">number</span> <span class="index">indexed</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">likedBy <span class="field-type">ObjectId[] (ref: User)</span> <span class="index">indexed</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">commentsCount <span class="field-type">number</span></div>
+                </div>
+                <p>Includes text indexes on caption and tags</p>
+                <p>Includes timestamps</p>
+            </div>
+
+            <div class="schema-card">
+                <h3>Comment Model</h3>
+                <div class="field">
+                    <div class="field-name">photo <span class="field-type">ObjectId (ref: Photo)</span> <span class="index">indexed</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">user <span class="field-type">ObjectId (ref: User)</span></div>
+                </div>
+                <div class="field">
+                    <div class="field-name">text <span class="field-type">string (required)</span></div>
+                </div>
+                <p>Includes timestamps</p>
+            </div>
+        </div>
+
+        <div class="relationships">
+            <h2>Relationships</h2>
+            <div class="relationship">
+                <div class="relationship-models">
+                    <span>User</span>
+                    <span>→</span>
+                    <span>Photo</span>
+                </div>
+                <div class="relationship-type">One-to-Many</div>
+                <div class="relationship-desc">A user can own many photos, but each photo has only one owner</div>
+            </div>
+            <div class="relationship">
+                <div class="relationship-models">
+                    <span>User</span>
+                    <span>→</span>
+                    <span>Comment</span>
+                </div>
+                <div class="relationship-type">One-to-Many</div>
+                <div class="relationship-desc">A user can write many comments, but each comment is written by one user</div>
+            </div>
+            <div class="relationship">
+                <div class="relationship-models">
+                    <span>Photo</span>
+                    <span>→</span>
+                    <span>Comment</span>
+                </div>
+                <div class="relationship-type">One-to-Many</div>
+                <div class="relationship-desc">A photo can have many comments, but each comment belongs to one photo</div>
+            </div>
+            <div class="relationship">
+                <div class="relationship-models">
+                    <span>User</span>
+                    <span>↔</span>
+                    <span>Photo</span>
+                </div>
+                <div class="relationship-type">Many-to-Many</div>
+                <div class="relationship-desc">A user can like many photos, and a photo can be liked by many users (via likedBy array)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true
+            },
+            er: {
+                layoutDirection: 'TB',
+                minEntityWidth: 100,
+                minEntityHeight: 75,
+                entityPadding: 15,
+                stroke: '#fff',
+                fill: '#1a1a1a',
+                fontSize: 12
+            }
+        });
+    </script>
+</body>
+</html>
