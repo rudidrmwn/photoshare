@@ -1,0 +1,51 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: photoshare-mongo
+    ports: 
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: photoshare-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: photoshare
+      MINIO_ROOT_PASSWORD: photoshare123
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console
+    volumes:
+      - minio_data:/data
+
+  backend:
+    build: ./backend
+    container_name: photoshare-backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/photoshare
+      PORT: 5000
+    depends_on:
+      - mongo
+      
+  frontend:
+    build: ./frontend
+    container_name: photoshare-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  minio_data:

@@ -1,0 +1,43 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import { connectDB } from './db.js';
+import { config } from './config.js';
+import authRoutes from './auth/auth.routes.js';
+import photoRoutes from './routes/photo.routes.js';
+import feedRoutes from './routes/feed.routes.js';
+import searchRoutes from './routes/search.routes.js';
+import commentsRoutes from './routes/comments.routes.js';
+import trendingRoutes from './routes/trending.routes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+await connectDB();
+const app = express();
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, { cors: { origin: '*' } });
+app.use((req, _res, next) => { req.io = io; next(); });
+app.use(cors()); app.use(helmet()); app.use(express.json({ limit: '1mb' })); app.use(morgan('dev'));
+app.use(rateLimit({ windowMs: 60_000, max: 300 }));
+app.use('/static', express.static(path.resolve(config.uploadDir)));
+app.use('/static', express.static(path.resolve(config.thumbDir)));
+app.get('/health', (_req, res) => res.json({ ok: true }));
+app.use('/api/auth', authRoutes);
+app.use('/api/photos', photoRoutes);
+app.use('/api/feed', feedRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/photos/:id/comments', commentsRoutes);
+app.use('/api/trending', trendingRoutes);
+io.on('connection', (socket) => {
+  socket.on('photo:join', (photoId) => socket.join(`photo:${photoId}`));
+  socket.on('photo:leave', (photoId) => socket.leave(`photo:${photoId}`));
+});
+httpServer.listen(config.port, () => {
+  console.log(`API listening on :${config.port}`);
+});
