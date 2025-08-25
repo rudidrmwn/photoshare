@@ -13,14 +13,33 @@ export default function PhotoCard({ p }) {
   async function toggleLike() {
     if (!user) return;
     try {
-      // kalau sudah like → panggil api.unlike
       const r = liked ? await api.unlike(p._id) : await api.like(p._id);
-
       setLikes(r.likes);
       setLiked(!liked);
     } catch (e) {
       console.error(e);
     }
+  }
+
+  // fungsi share
+  function shareToInstagram() {
+    const url = encodeURIComponent(window.location.origin + "/photos/" + p._id);
+    window.open(`https://www.instagram.com/?url=${url}`, "_blank");
+  }
+
+  function shareToTikTok() {
+    const url = encodeURIComponent(window.location.origin + "/photos/" + p._id);
+    window.open(`https://www.tiktok.com/share?url=${url}`, "_blank");
+  }
+
+  function shareToPinterest() {
+    const url = encodeURIComponent(window.location.origin + "/photos/" + p._id);
+    const media = encodeURIComponent(p.thumbUrl);
+    const desc = encodeURIComponent(p.caption || "Check this photo!");
+    window.open(
+      `https://pinterest.com/pin/create/button/?url=${url}&media=${media}&description=${desc}`,
+      "_blank"
+    );
   }
 
   return (
@@ -45,6 +64,11 @@ export default function PhotoCard({ p }) {
             {liked ? "❤️" : "🤍"} {likes}
           </button>
           <CommentsModal photoId={p._id} />
+
+          {/* Tombol share */}
+          <button onClick={shareToInstagram}>📷 IG</button>
+          <button onClick={shareToTikTok}>🎵 TikTok</button>
+          <button onClick={shareToPinterest}>📌 Pinterest</button>
         </div>
       </div>
     </div>
